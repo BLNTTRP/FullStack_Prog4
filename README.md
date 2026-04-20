@@ -6,7 +6,7 @@
 **Comisión 4**
 
 Este repositorio unifica la aplicación completa (backend y frontend):
-* El backend (fastapi-productos) está desarrollado con FastAPI, Pydantic y SQLAlchemy.
+* El backend (fastapi-productos) está desarrollado con FastAPI, Pydantic y SQLModel.
 * El frontend (front-productos) está desarrollado con React, TypeScript y Tailwind CSS 4.
 
 El README.md de cada proyecto especifico se encuentra dentro de sus respectivas carpetas.
