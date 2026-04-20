@@ -1,0 +1,124 @@
+@baseUrl = http://localhost:8000/api
+
+### ==============
+### 1. CATEGORÍAS
+### ==============
+
+### Crear Categoría Padre
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "Comida Rápida",
+  "descripcion": "Comidas preparadas y servidas rápidamente",
+  "imagen_url": "https://ejemplo.com/img/comida-rapida.png"
+}
+
+### Crear Subcategoría (Hamburguesas - Asume que la anterior tomó el ID 1)
+POST {{baseUrl}}/categorias/
+Content-Type: application/json
+
+{
+  "nombre": "Hamburguesas",
+  "descripcion": "Todo tipo de hamburguesas",
+  "parent_id": 1
+}
+
+### Obtener todas las categorías
+GET {{baseUrl}}/categorias/
+
+### ================
+### 2. INGREDIENTES
+### ================
+
+### Crear Ingrediente Normal (Tomate)
+POST {{baseUrl}}/ingredientes/
+Content-Type: application/json
+
+{
+  "nombre": "Tomate fresco",
+  "es_alergeno": false
+}
+
+### Crear Ingrediente Alérgeno (Queso Cheddar)
+POST {{baseUrl}}/ingredientes/
+Content-Type: application/json
+
+{
+  "nombre": "Queso Cheddar",
+  "es_alergeno": true
+}
+
+### Obtener todos los ingredientes
+GET {{baseUrl}}/ingredientes/
+
+### =============
+### 3. PRODUCTOS
+### =============
+
+### Crear Producto (Conecta con Categorías 1 y 2, e Ingredientes 1 y 2)
+POST {{baseUrl}}/productos/
+Content-Type: application/json
+
+{
+  "nombre": "Hamburguesa Clásica",
+  "descripcion": "Doble carne, queso cheddar y tomate fresco",
+  "precio_base": 8.50,
+  "imagenes_url": [
+    "https://ejemplo.com/hamb1.jpg",
+    "https://ejemplo.com/hamb2.jpg"
+  ],
+  "disponible": true,
+  "stock_cantidad": 50,
+  "categorias": [
+    {
+      "categoria_id": 1,
+      "es_principal": true
+    },
+    {
+      "categoria_id": 2,
+      "es_principal": false
+    }
+  ],
+  "ingredientes": [
+    {
+      "ingrediente_id": 1,
+      "es_removible": true
+    },
+    {
+      "ingrediente_id": 2,
+      "es_removible": false
+    }
+  ]
+}
+
+### Obtener todos los productos (Trae todas las relaciones anidadas)
+GET {{baseUrl}}/productos/
+
+### Actualizar un Producto (Actualizando campos y relaciones)
+PUT {{baseUrl}}/productos/1
+Content-Type: application/json
+
+{
+  "nombre": "Hamburguesa Clásica Especial",
+  "descripcion": "Doble carne, queso cheddar y tomate fresco",
+  "precio_base": 9.99,
+  "imagenes_url": ["https://ejemplo.com/hamb1.jpg"],
+  "disponible": true,
+  "stock_cantidad": 45,
+  "categorias": [
+    {
+      "categoria_id": 1,
+      "es_principal": true
+    }
+  ],
+  "ingredientes": [
+    {
+      "ingrediente_id": 2,
+      "es_removible": false
+    }
+  ]
+}
+
+### Eliminar Producto (Prueba el borrado lógico)
+DELETE {{baseUrl}}/productos/1

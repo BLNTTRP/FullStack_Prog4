@@ -1,0 +1,31 @@
+# =========================
+# Archivos de Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# Entornos Virtuales
+# =========================
+venv/
+env/
+.venv/
+
+# =========================
+# Variables de Entorno
+# =========================
+.env
+
+# =========================
+# Base de Datos Local
+# =========================
+productos.db
+*.sqlite3
+
+# =========================
+# Archivos de SO y Editores
+# =========================
+.DS_Store
+.vscode/
+.idea/
