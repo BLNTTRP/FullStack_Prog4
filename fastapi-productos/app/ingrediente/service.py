@@ -1,13 +1,15 @@
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 from sqlalchemy.sql import func
 from app.ingrediente.model import Ingrediente
 from app.ingrediente.schema import IngredienteCreate
 
 def get_ingredientes(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Ingrediente).filter(Ingrediente.deleted_at.is_(None)).offset(skip).limit(limit).all()
+    statement = select(Ingrediente).where(Ingrediente.deleted_at.is_(None)).offset(skip).limit(limit)
+    return db.exec(statement).all()
 
 def get_ingrediente(db: Session, ingrediente_id: int):
-    return db.query(Ingrediente).filter(Ingrediente.id == ingrediente_id, Ingrediente.deleted_at.is_(None)).first()
+    statement = select(Ingrediente).where(Ingrediente.id == ingrediente_id, Ingrediente.deleted_at.is_(None))
+    return db.exec(statement).first()
 
 def create_ingrediente(db: Session, ingrediente: IngredienteCreate):
     db_ingrediente = Ingrediente(**ingrediente.model_dump())

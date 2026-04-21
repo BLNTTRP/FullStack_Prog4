@@ -1,19 +1,23 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
-from sqlalchemy.orm import relationship
+from __future__ import annotations
+from typing import Optional, List, TYPE_CHECKING
+from datetime import datetime
+from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy.sql import func
-from app.core.database import Base
 
-class Ingrediente(Base):
+if TYPE_CHECKING:
+    from app.producto.model import ProductoIngrediente
+
+class Ingrediente(SQLModel, table=True):
     __tablename__ = "ingredientes"
 
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, index=True)
-    es_alergeno = Column(Boolean, default=False)
+    id: Optional[int] = Field(default=None, primary_key=True, index=True)
+    nombre: str = Field(index=True)
+    es_alergeno: bool = Field(default=False)
 
     # Campos de auditoría
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    deleted_at = Column(DateTime(timezone=True), nullable=True)
+    created_at: Optional[datetime] = Field(default=None, sa_column_kwargs={"server_default": func.now()})
+    updated_at: Optional[datetime] = Field(default=None, sa_column_kwargs={"onupdate": func.now()})
+    deleted_at: Optional[datetime] = Field(default=None)
 
     # Relación con la tabla intermedia
-    productos_asociados = relationship("ProductoIngrediente", back_populates="ingrediente")
+    productos_asociados: List[ProductoIngrediente] = Relationship(back_populates="ingrediente")

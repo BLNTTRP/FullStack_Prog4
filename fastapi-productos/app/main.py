@@ -1,18 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.database import engine, Base
+from sqlmodel import SQLModel
+from app.core.database import engine
 from app.categoria.router import router as categoria_router
 from app.producto.router import router as producto_router
 from app.ingrediente.router import router as ingrediente_router
+from app.categoria.model import Categoria
+from app.ingrediente.model import Ingrediente
+from app.producto.model import Producto, ProductoCategoria, ProductoIngrediente
 
 # Crea todas las tablas en la base de datos
-Base.metadata.create_all(bind=engine)
+SQLModel.metadata.create_all(engine)
 
 # Inicializamos la aplicación FastAPI
 app = FastAPI(
     title="API Full Stack - Productos, Categorías, Ingredientes",
     description="Backend para el proyecto con React y FastAPI",
-    version="2.0.0"
+    version="3.0.0"
 )
 
 # Configuración de CORS

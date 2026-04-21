@@ -1,14 +1,16 @@
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 from sqlalchemy.sql import func
 from app.categoria.model import Categoria
 from app.categoria.schema import CategoriaCreate
 
 def get_categorias(db: Session, skip: int = 0, limit: int = 100):
     # Solo traemos las que NO están eliminadas
-    return db.query(Categoria).filter(Categoria.deleted_at.is_(None)).offset(skip).limit(limit).all()
+    statement = select(Categoria).where(Categoria.deleted_at.is_(None)).offset(skip).limit(limit)
+    return db.exec(statement).all()
 
 def get_categoria(db: Session, categoria_id: int):
-    return db.query(Categoria).filter(Categoria.id == categoria_id, Categoria.deleted_at.is_(None)).first()
+    statement = select(Categoria).where(Categoria.id == categoria_id, Categoria.deleted_at.is_(None))
+    return db.exec(statement).first()
 
 def create_categoria(db: Session, categoria: CategoriaCreate):
     db_categoria = Categoria(**categoria.model_dump())
