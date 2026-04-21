@@ -16,7 +16,9 @@ Este es el backend del proyecto Full Stack de Gestión de Categorías, Productos
 ## ⚙️ Requisitos Previos
 
 Asegúrate de tener instalado en tu computadora:
-* Python 3.8 o superior.
+* **Python 3.8** o superior.
+* **PostgreSQL:** El motor de base de datos instalado y corriendo.
+* **pgAdmin 4 (Opcional pero recomendado):** Para gestionar la base de datos de forma visual.
 
 ---
 
@@ -24,7 +26,14 @@ Asegúrate de tener instalado en tu computadora:
 
 Sigue estos pasos para ejecutar el proyecto en tu entorno local:
 
-**1. Crear y activar un entorno virtual (Recomendado)**
+**1. Preparar la Base de Datos en pgAdmin 4**
+Antes de levantar el servidor, necesitas crear la base de datos:
+1. Abre **pgAdmin 4** y conéctate a tu servidor local de PostgreSQL.
+2. Haz clic derecho sobre **Databases** > **Create** > **Database...**
+3. En el campo **Database**, escribe el nombre: `productos_db` (o el nombre que prefieras usar en tu `.env`).
+4. Haz clic en **Save**. El servidor de FastAPI (a través de SQLModel) se encargará de crear las tablas automáticamente cuando lo inicies.
+
+**2. Crear y activar un entorno virtual (Recomendado)**
 Es una buena práctica aislar las dependencias del proyecto.
 
 * En Windows:
@@ -38,12 +47,12 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-**2. Instalar las dependencias**
+**3. Instalar las dependencias**
 ```bash
 pip install -r requirements.txt
 ```
 
-**3. Configurar variables de entorno**
+**4. Configurar variables de entorno**
 Crea un archivo llamado `.env` en la raíz del proyecto y agrega la configuración de la base de datos:
 ```
 POSTGRES_USER=admin (o tu usuario seteado)
