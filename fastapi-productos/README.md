@@ -5,7 +5,7 @@ Este es el backend del proyecto Full Stack de Gestión de Categorías, Productos
 ## 🚀 Tecnologías Utilizadas
 
 * **Framework:** FastAPI
-* **Base de Datos:** SQLite
+* **Base de Datos:** PostgreSQL
 * **ORM:** SQLModel
 * **Validación de Datos:** Pydantic
 * **Tipado Avanzado:** Uso de `Annotated` para dependencias y validaciones más limpias.
@@ -46,7 +46,11 @@ pip install -r requirements.txt
 **3. Configurar variables de entorno**
 Crea un archivo llamado `.env` en la raíz del proyecto y agrega la configuración de la base de datos:
 ```
-DATABASE_URL="sqlite:///./productos.db"
+POSTGRES_USER=admin (o tu usuario seteado)
+POSTGRES_PASSWORD=root (o tu contraseña seteada)
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=productos_db
 ```
 
 ---
