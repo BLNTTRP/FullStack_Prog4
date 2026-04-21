@@ -4,7 +4,7 @@ from sqlmodel import create_engine, Session
 
 load_dotenv()
 
-DB_USER = os.getenv("POSTGRES_USER", "admin")
+DB_USER = os.getenv("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "root")
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
