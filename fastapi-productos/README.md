@@ -1,13 +1,14 @@
-# 🛒 Backend - Gestión de Productos y Categorías
+# 🛒 Backend - Gestión de Categorías, Productos e Ingredientes
 
-Este es el backend del proyecto Full Stack de Gestión de Productos y Categorías, desarrollado con **FastAPI** y **Python**. Provee una API RESTful para gestionar un sistema de productos y categorías con relaciones de base de datos (Muchos a Muchos).
+Este es el backend del proyecto Full Stack de Gestión de Categorías, Productos e Ingredientes, desarrollado con **FastAPI** y **Python**. Provee una API RESTful para gestionar un sistema de productos y categorías con relaciones de base de datos (Muchos a Muchos).
 
 ## 🚀 Tecnologías Utilizadas
 
 * **Framework:** FastAPI
 * **Base de Datos:** SQLite
-* **ORM:** SQLAlchemy
+* **ORM:** SQLModel
 * **Validación de Datos:** Pydantic
+* **Tipado Avanzado:** Uso de `Annotated` para dependencias y validaciones más limpias.
 * **Servidor:** Uvicorn
 
 ---
