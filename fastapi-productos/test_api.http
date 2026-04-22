@@ -64,10 +64,6 @@ Content-Type: application/json
   "nombre": "Hamburguesa Clásica",
   "descripcion": "Doble carne, queso cheddar y tomate fresco",
   "precio_base": 8.50,
-  "imagenes_url": [
-    "https://ejemplo.com/hamb1.jpg",
-    "https://ejemplo.com/hamb2.jpg"
-  ],
   "disponible": true,
   "stock_cantidad": 50,
   "categorias": [
@@ -103,7 +99,6 @@ Content-Type: application/json
   "nombre": "Hamburguesa Clásica Especial",
   "descripcion": "Doble carne, queso cheddar y tomate fresco",
   "precio_base": 9.99,
-  "imagenes_url": ["https://ejemplo.com/hamb1.jpg"],
   "disponible": true,
   "stock_cantidad": 45,
   "categorias": [
