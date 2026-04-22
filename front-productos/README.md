@@ -1,4 +1,4 @@
-# 💻 Frontend - Interfaz de Gestión de Categorías
+# 💻 Frontend - Interfaz de Gestión de Productos y Categorías
 
 Este es el frontend del proyecto Full Stack de Gestión de Productos y Categorías, desarrollado con **React**, **TypeScript** y empaquetado con **Vite**. Su función principal es consumir la API del backend para realizar el CRUD completo de Categorías mediante la interfaz de usuario.
 
@@ -8,6 +8,7 @@ Este es el frontend del proyecto Full Stack de Gestión de Productos y Categorí
 * **Lenguaje:** TypeScript
 * **Build Tool:** Vite
 * **Estilos:** Tailwind CSS
+* **Manejo de Estado del Servidor:** React Query
 * **Peticiones HTTP:** Fetch API nativo
 
 ---
