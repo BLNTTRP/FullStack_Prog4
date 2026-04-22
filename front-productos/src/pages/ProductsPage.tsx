@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import ProductoList from '../components/ProductoList';
 import ProductoModal from '../components/ProductoModal';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Producto, NuevoProducto } from '../types/producto';
 import type { Categoria } from '../types/categoria';
 import type { Ingrediente } from '../types/ingrediente';
@@ -8,70 +9,77 @@ import type { Ingrediente } from '../types/ingrediente';
 const API_BASE_URL = 'http://localhost:8000/api';
 
 export default function ProductsPage() {
-    const [productos, setProductos] = useState<Producto[]>([]);
-    // Estados para las listas de opciones del modal
-    const [categorias, setCategorias] = useState<Categoria[]>([]);
-    const [ingredientes, setIngredientes] = useState<Ingrediente[]>([]);
-
+    const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [productoAEditar, setProductoAEditar] = useState<Producto | null>(null);
 
-    const fetchData = useCallback(async () => {
-        try {
-            const [prodRes, catRes, ingRes] = await Promise.all([
-                fetch(`${API_BASE_URL}/productos/`),
-                fetch(`${API_BASE_URL}/categorias/`),
-                fetch(`${API_BASE_URL}/ingredientes/`)
-            ]);
-
-            if (prodRes.ok) setProductos(await prodRes.json());
-            if (catRes.ok) setCategorias(await catRes.json());
-            if (ingRes.ok) setIngredientes(await ingRes.json());
-        } catch (error) {
-            console.error('Error al cargar datos:', error);
+    // Queries para obtener Productos, Categorías e Ingredientes
+    const { data: productos = [], isLoading: loadingProductos, isError: errorProductos } = useQuery<Producto[]>({
+        queryKey: ['productos'],
+        queryFn: async () => {
+            const res = await fetch(`${API_BASE_URL}/productos/`);
+            if (!res.ok) throw new Error('Error al cargar productos');
+            return res.json();
         }
-    }, []);
+    });
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+    const { data: categorias = [] } = useQuery<Categoria[]>({
+        queryKey: ['categorias'],
+        queryFn: async () => {
+            const res = await fetch(`${API_BASE_URL}/categorias/`);
+            if (!res.ok) throw new Error('Error al cargar categorias');
+            return res.json();
+        }
+    });
 
-    const handleCreate = async (nuevoProducto: NuevoProducto) => {
-        try {
+    const { data: ingredientes = [] } = useQuery<Ingrediente[]>({
+        queryKey: ['ingredientes'],
+        queryFn: async () => {
+            const res = await fetch(`${API_BASE_URL}/ingredientes/`);
+            if (!res.ok) throw new Error('Error al cargar ingredientes');
+            return res.json();
+        }
+    });
+
+    // Mutaciones
+    const createMutation = useMutation({
+        mutationFn: async (nuevoProducto: NuevoProducto) => {
             const response = await fetch(`${API_BASE_URL}/productos/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(nuevoProducto),
             });
-            if (response.ok) fetchData();
-        } catch (error) {
-            console.error('Error al crear:', error);
-        }
-    };
+            if (!response.ok) throw new Error('Error al crear producto');
+            return response.json();
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['productos'] })
+    });
 
-    const handleUpdate = async (id: number, productoActualizado: NuevoProducto) => {
-        try {
+    const updateMutation = useMutation({
+        mutationFn: async ({ id, datos }: { id: number; datos: NuevoProducto }) => {
             const response = await fetch(`${API_BASE_URL}/productos/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(productoActualizado),
+                body: JSON.stringify(datos),
             });
-            if (response.ok) fetchData();
-        } catch (error) {
-            console.error('Error al actualizar:', error);
-        }
-    };
+            if (!response.ok) throw new Error('Error al actualizar producto');
+            return response.json();
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['productos'] })
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: async (id: number) => {
+            const response = await fetch(`${API_BASE_URL}/productos/${id}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Error al eliminar producto');
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['productos'] })
+    });
+
 
     const handleDelete = async (id: number) => {
         if (!window.confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
-        try {
-            const response = await fetch(`${API_BASE_URL}/productos/${id}`, { method: 'DELETE' });
-            if (response.ok) {
-                setProductos(productos.filter(prod => prod.id !== id));
-            }
-        } catch (error) {
-            console.error('Error al eliminar:', error);
-        }
+        deleteMutation.mutate(id);
     };
 
     const openCreateModal = () => {
@@ -86,11 +94,15 @@ export default function ProductsPage() {
 
     const handleModalSubmit = (datos: NuevoProducto, id?: number) => {
         if (id !== undefined) {
-            handleUpdate(id, datos);
+            updateMutation.mutate({ id, datos });
         } else {
-            handleCreate(datos);
+            createMutation.mutate(datos);
         }
+        setIsModalOpen(false);
     };
+
+    if (loadingProductos) return <div className="p-8 text-center">Cargando productos...</div>;
+    if (errorProductos) return <div className="p-8 text-center text-red-500">Error al cargar los productos</div>;
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
