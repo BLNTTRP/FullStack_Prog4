@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
+from typing import List
 from app.categoria.schema import CategoriaResponse
 from app.ingrediente.schema import IngredienteResponse
 
@@ -7,7 +7,6 @@ class ProductoBase(BaseModel):
     nombre: str
     descripcion: str
     precio_base: float
-    imagenes_url: List[str] = []
     disponible: bool = True
     stock_cantidad: int = 0
 

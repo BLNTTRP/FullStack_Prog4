@@ -1,6 +1,6 @@
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 from datetime import datetime
-from sqlmodel import SQLModel, Field, Relationship, JSON, Column
+from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy.sql import func
 from app.categoria.model import Categoria
 from app.ingrediente.model import Ingrediente
@@ -40,7 +40,6 @@ class Producto(SQLModel, table=True):
     nombre: str = Field(index=True)
     descripcion: Optional[str] = Field(default=None)
     precio_base: float = Field()
-    imagenes_url: List[str] = Field(default=[], sa_column=Column(JSON))
     disponible: bool = Field(default=True)
     stock_cantidad: int = Field(default=0)
 
