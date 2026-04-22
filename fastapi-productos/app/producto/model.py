@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship, JSON, Column
@@ -16,7 +15,7 @@ class ProductoCategoria(SQLModel, table=True):
     created_at: Optional[datetime] = Field(default=None, sa_column_kwargs={"server_default": func.now()})
 
     # Relaciones hacia los modelos principales
-    producto: Optional[Producto] = Relationship(back_populates="categorias_asociadas")
+    producto: Optional["Producto"] = Relationship(back_populates="categorias_asociadas")
     categoria: Optional[Categoria] = Relationship(back_populates="productos_asociados")
 
 
@@ -29,7 +28,7 @@ class ProductoIngrediente(SQLModel, table=True):
     es_removible: bool = Field(default=True)
     created_at: Optional[datetime] = Field(default=None, sa_column_kwargs={"server_default": func.now()})
 
-    producto: Optional[Producto] = Relationship(back_populates="ingredientes_asociados")
+    producto: Optional["Producto"] = Relationship(back_populates="ingredientes_asociados")
     ingrediente: Optional[Ingrediente] = Relationship(back_populates="productos_asociados")
 
 

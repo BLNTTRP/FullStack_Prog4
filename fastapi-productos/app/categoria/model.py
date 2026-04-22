@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
@@ -24,13 +23,13 @@ class Categoria(SQLModel, table=True):
     deleted_at: Optional[datetime] = Field(default=None)
 
     # Relación recursiva para obtener el padre y los hijos fácilmente
-    subcategorias: List[Categoria] = Relationship(
+    subcategorias: List["Categoria"] = Relationship(
         back_populates="parent"
     )
-    parent: Optional[Categoria] = Relationship(
+    parent: Optional["Categoria"] = Relationship(
         back_populates="subcategorias",
         sa_relationship_kwargs={"remote_side": "Categoria.id"}
     )
 
     # Relación con ProductoCategoria
-    productos_asociados: List[ProductoCategoria] = Relationship(back_populates="categoria")
+    productos_asociados: List["ProductoCategoria"] = Relationship(back_populates="categoria")

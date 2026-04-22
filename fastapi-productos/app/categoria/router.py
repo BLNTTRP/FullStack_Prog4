@@ -29,7 +29,10 @@ def create_categoria(categoria: schema.CategoriaCreate, db: SessionDep):
 
 @router.put("/{categoria_id}", response_model=schema.CategoriaResponse)
 def update_categoria(categoria_id: int, categoria: schema.CategoriaCreate, db: SessionDep):
-    db_categoria = service.update_categoria(db, categoria_id, categoria.model_dump())
+    # Usamos exclude_unset=True para obtener solo los campos que el usuario envió explicitamente
+    datos_actualizar = categoria.model_dump(exclude_unset=True)
+
+    db_categoria = service.update_categoria(db, categoria_id, datos_actualizar)
     if db_categoria is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     return db_categoria

@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
@@ -20,4 +19,4 @@ class Ingrediente(SQLModel, table=True):
     deleted_at: Optional[datetime] = Field(default=None)
 
     # Relación con la tabla intermedia
-    productos_asociados: List[ProductoIngrediente] = Relationship(back_populates="ingrediente")
+    productos_asociados: List["ProductoIngrediente"] = Relationship(back_populates="ingrediente")
