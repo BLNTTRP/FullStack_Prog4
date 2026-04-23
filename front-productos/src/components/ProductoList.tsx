@@ -20,6 +20,7 @@ export default function ProductoList({ productos, onEdit, onDelete }: Props) {
             <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                     <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Base</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
@@ -30,6 +31,9 @@ export default function ProductoList({ productos, onEdit, onDelete }: Props) {
                 <tbody className="bg-white divide-y divide-gray-200">
                     {productos.map((prod) => (
                         <tr key={prod.id} className="group hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {prod.id}
+                            </td>
                             <td className="px-6 py-4 text-sm font-medium text-gray-900">
                                 {prod.nombre}
                                 {/* Pequeña alerta si tiene alérgenos */}
