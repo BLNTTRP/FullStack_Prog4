@@ -10,8 +10,7 @@ Content-Type: application/json
 
 {
   "nombre": "Comida Rápida",
-  "descripcion": "Comidas preparadas y servidas rápidamente",
-  "imagen_url": "https://ejemplo.com/img/comida-rapida.png"
+  "descripcion": "Comidas preparadas y servidas rápidamente"
 }
 
 ### Crear Subcategoría (Hamburguesas - Asume que la anterior tomó el ID 1)
