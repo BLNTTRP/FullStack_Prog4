@@ -17,7 +17,6 @@ export interface Producto {
     nombre: string;
     descripcion: string;
     precio_base: number;
-    imagenes_url: string[];
     disponible: boolean;
     stock_cantidad: number;
     categorias_asociadas: ProductoCategoria[];
@@ -39,7 +38,6 @@ export interface NuevoProducto {
     nombre: string;
     descripcion: string;
     precio_base: number;
-    imagenes_url: string[];
     disponible: boolean;
     stock_cantidad: number;
     categorias: CategoriaAsignacion[];
