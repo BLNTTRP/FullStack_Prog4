@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import IngredienteList from '../components/IngredienteList';
 import IngredienteModal from '../components/IngredienteModal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 import type { Ingrediente, NuevoIngrediente } from '../types/ingrediente';
 
 const API_URL = 'http://localhost:8000/api/ingredientes';
 
 export default function IngredientesPage() {
+    const { id: urlId } = useParams();
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [ingredienteAEditar, setIngredienteAEditar] = useState<Ingrediente | null>(null);
@@ -59,6 +61,17 @@ export default function IngredientesPage() {
         if (!window.confirm('¿Estás seguro de que deseas eliminar este ingrediente?')) return;
         deleteMutation.mutate(id);
     };
+
+    // Efecto para abrir el modal si la URL incluye un ID válido
+    useEffect(() => {
+        if (urlId && ingredientes.length > 0) {
+            const ingredienteEncontrado = ingredientes.find(i => i.id === Number(urlId));
+            if (ingredienteEncontrado) {
+                setIngredienteAEditar(ingredienteEncontrado);
+                setIsModalOpen(true);
+            }
+        }
+    }, [urlId, ingredientes]);
 
     const openCreateModal = () => {
         setIngredienteAEditar(null);

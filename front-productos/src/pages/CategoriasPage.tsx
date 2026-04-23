@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CategoriaList from '../components/CategoriaList';
 import CategoriaModal from '../components/CategoriaModal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 import type { Categoria, NuevaCategoria } from '../types/categoria';
 
 const API_URL = 'http://localhost:8000/api/categorias';
 
 export default function CategoriasPage() {
+    const { id: urlId } = useParams();
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [categoriaAEditar, setCategoriaAEditar] = useState<Categoria | null>(null);
@@ -69,6 +71,16 @@ export default function CategoriasPage() {
         deleteMutation.mutate(id);
     };
 
+    // Efecto para abrir el modal si la URL incluye un ID válido
+    useEffect(() => {
+        if (urlId && categorias.length > 0) {
+            const categoriaEncontrada = categorias.find(c => c.id === Number(urlId));
+            if (categoriaEncontrada) {
+                setCategoriaAEditar(categoriaEncontrada);
+                setIsModalOpen(true);
+            }
+        }
+    }, [urlId, categorias]);
 
     const openCreateModal = () => {
         setCategoriaAEditar(null);

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProductoList from '../components/ProductoList';
 import ProductoModal from '../components/ProductoModal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 import type { Producto, NuevoProducto } from '../types/producto';
 import type { Categoria } from '../types/categoria';
 import type { Ingrediente } from '../types/ingrediente';
@@ -9,6 +10,7 @@ import type { Ingrediente } from '../types/ingrediente';
 const API_BASE_URL = 'http://localhost:8000/api';
 
 export default function ProductsPage() {
+    const { id: urlId } = useParams();
     const queryClient = useQueryClient();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [productoAEditar, setProductoAEditar] = useState<Producto | null>(null);
@@ -81,6 +83,17 @@ export default function ProductsPage() {
         if (!window.confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
         deleteMutation.mutate(id);
     };
+
+    // Efecto para abrir el modal si la URL incluye un ID válido
+    useEffect(() => {
+        if (urlId && productos.length > 0 && categorias.length > 0 && ingredientes.length > 0) {
+            const productoEncontrado = productos.find(p => p.id === Number(urlId));
+            if (productoEncontrado) {
+                setProductoAEditar(productoEncontrado);
+                setIsModalOpen(true);
+            }
+        }
+    }, [urlId, productos, categorias, ingredientes]);
 
     const openCreateModal = () => {
         setProductoAEditar(null);
