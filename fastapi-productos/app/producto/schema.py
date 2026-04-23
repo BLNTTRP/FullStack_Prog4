@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import List
 from app.categoria.schema import CategoriaResponse
 from app.ingrediente.schema import IngredienteResponse
@@ -6,9 +6,10 @@ from app.ingrediente.schema import IngredienteResponse
 class ProductoBase(BaseModel):
     nombre: str
     descripcion: str
-    precio_base: float
     disponible: bool = True
-    stock_cantidad: int = 0
+    # Usando Field(ge=0) nos aseguramos que sea mayor o igual a 0.
+    precio_base: float = Field(..., ge=0.0, description="El precio debe ser 0 o mayor")
+    stock_cantidad: int = Field(..., ge=0, description="El stock no puede ser negativo")
 
 # Esquemas para recibir datos al CREAR un producto
 class CategoriaAsignacion(BaseModel):
