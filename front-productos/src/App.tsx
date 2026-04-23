@@ -15,10 +15,10 @@ function App() {
                         {/* Redirección: si entran a localhost:5173/ los manda a /categorias */}
                         <Route path="/" element={<Navigate to="/categorias" replace />} />
 
-                        {/* Rutas de las páginas */}
-                        <Route path="/categorias" element={<CategoriasPage />} />
-                        <Route path="/productos" element={<ProductsPage />} />
-                        <Route path="/ingredientes" element={<IngredientesPage />} />
+                        {/* Rutas de las páginas con soporte opcional para ID */}
+                        <Route path="/categorias/:id?" element={<CategoriasPage />} />
+                        <Route path="/productos/:id?" element={<ProductsPage />} />
+                        <Route path="/ingredientes/:id?" element={<IngredientesPage />} />
                     </Routes>
                 </main>
             </div>
