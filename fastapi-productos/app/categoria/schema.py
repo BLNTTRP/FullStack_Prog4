@@ -5,7 +5,6 @@ from typing import Optional
 class CategoriaBase(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
-    imagen_url: Optional[str] = None
     parent_id: Optional[int] = None
 
 # Esquema para crear

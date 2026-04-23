@@ -12,7 +12,6 @@ class Categoria(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True, index=True)
     nombre: str = Field(index=True)
     descripcion: Optional[str] = Field(default=None)
-    imagen_url: Optional[str] = Field(default=None)
 
     # Clave foránea a sí misma para permitir Subcategorías
     parent_id: Optional[int] = Field(default=None, foreign_key="categorias.id")
