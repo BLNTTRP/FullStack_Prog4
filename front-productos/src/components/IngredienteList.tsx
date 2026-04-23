@@ -1,52 +1,67 @@
 import type { Ingrediente } from '../types/ingrediente';
 
-interface IngredienteListProps {
+interface Props {
     ingredientes: Ingrediente[];
     onEdit: (ingrediente: Ingrediente) => void;
     onDelete: (id: number) => void;
 }
 
-export default function IngredienteList({ ingredientes, onEdit, onDelete }: IngredienteListProps) {
+export default function IngredienteList({ ingredientes, onEdit, onDelete }: Props) {
     if (ingredientes.length === 0) {
         return (
-            <div className="text-center py-10 bg-white rounded-lg shadow-sm border border-gray-200">
-                <p className="text-gray-500 text-lg">No hay ingredientes registrados.</p>
+            <div className="text-center py-10 text-gray-500">
+                No hay ingredientes registrados. Crea uno nuevo
             </div>
         );
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {ingredientes.map((ing) => (
-                <div key={ing.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col justify-between hover:shadow-md transition-shadow">
-                    <div className="mb-4">
-                        <div className="flex justify-between items-start">
-                            <h3 className="text-lg font-semibold text-gray-800 break-words pr-2">{ing.nombre}</h3>
-                            {ing.es_alergeno && (
-                                <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full flex-shrink-0" title="Alérgeno">
-                                    ⚠️
-                                </span>
-                            )}
-                        </div>
-                        {ing.es_alergeno && <p className="text-xs text-red-500 mt-1">Contiene alérgenos</p>}
-                    </div>
-
-                    <div className="flex space-x-2 border-t border-gray-100 pt-3">
-                        <button
-                            onClick={() => onEdit(ing)}
-                            className="flex-1 px-2 py-1.5 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition-colors text-sm font-medium"
-                        >
-                            Editar
-                        </button>
-                        <button
-                            onClick={() => onDelete(ing.id)}
-                            className="flex-1 px-2 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-sm font-medium"
-                        >
-                            Eliminar
-                        </button>
-                    </div>
-                </div>
-            ))}
+        <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                    <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alérgeno</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {ingredientes.map((ing) => (
+                        <tr key={ing.id} className="group hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {ing.id}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {ing.nombre}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {ing.es_alergeno ? (
+                                    <span className="text-red-600 bg-red-100 px-2 py-1 rounded-md text-xs font-bold">⚠️ Sí</span>
+                                ) : (
+                                    <span className="text-gray-500">No</span>
+                                )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div className="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={() => onEdit(ing)}
+                                        className="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+                                    >
+                                        Editar
+                                    </button>
+                                    <button
+                                        onClick={() => onDelete(ing.id)}
+                                        className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }
