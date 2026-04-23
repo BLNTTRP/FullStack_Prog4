@@ -33,7 +33,7 @@ POSTGRES_USER=postgres (o tu usuario seteado)
 POSTGRES_PASSWORD=root (o tu contraseña seteada)
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=productos_db
+POSTGRES_DB=productos_db (o el nombre que prefieras usar)
 ```
 
 **2. Preparar la Base de Datos en pgAdmin 4**
