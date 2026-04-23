@@ -16,7 +16,6 @@ const estadoInicial: NuevoProducto = {
     nombre: '',
     descripcion: '',
     precio_base: 0,
-    imagenes_url: [],
     disponible: true,
     stock_cantidad: 0,
     categorias: [],
@@ -29,7 +28,6 @@ const inicializarEstado = (producto: Producto | null): NuevoProducto => {
             nombre: producto.nombre,
             descripcion: producto.descripcion,
             precio_base: producto.precio_base,
-            imagenes_url: producto.imagenes_url,
             disponible: producto.disponible,
             stock_cantidad: producto.stock_cantidad,
             categorias: producto.categorias_asociadas.map(c => ({
@@ -54,21 +52,12 @@ export default function ProductoModal({
 }: ProductoModalProps) {
 
     const [formData, setFormData] = useState<NuevoProducto>(() => inicializarEstado(productoAEditar));
-    const [urlsInput, setUrlsInput] = useState(() =>
-        productoAEditar ? productoAEditar.imagenes_url.join(', ') : ''
-    );
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked :
                     type === 'number' ? parseFloat(value) : value;
         setFormData(prev => ({ ...prev, [name]: val }));
-    };
-
-    const handleUrlsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUrlsInput(e.target.value);
-        const urlsArray = e.target.value.split(',').map(url => url.trim()).filter(url => url !== '');
-        setFormData(prev => ({ ...prev, imagenes_url: urlsArray }));
     };
 
     const toggleCategoria = (categoriaId: number) => {
@@ -151,11 +140,6 @@ export default function ProductoModal({
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                             <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} required className="w-full border border-gray-300 rounded-md px-3 py-2 h-20" />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">URLs de Imágenes (Separadas por coma)</label>
-                            <input type="text" value={urlsInput} onChange={handleUrlsChange} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm" placeholder="https://img1.jpg, https://img2.jpg" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
