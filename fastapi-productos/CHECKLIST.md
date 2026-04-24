@@ -5,4 +5,4 @@
 * [ 🆗 ] **Validación**: Uso de Annotated, Query y Path para reglas de negocio (ej. longitudes, rangos).
 * [ 🆗 ] **CRUD Persistente**: Endpoints funcionales para Crear, Leer, Actualizar y Borrar en PostgreSQL.
 * [ 🆗 ] **Seguridad de Datos**: Implementación de response_model para no filtrar datos sensibles o innecesarios.
-* [ 🆗 ] **Estructura**: Código organizado por módulos (routers, schemas, services, models, uow).
+* [ 🆗 ] **Estructura**: Código organizado por módulos (routers, schemas, services, models).
