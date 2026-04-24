@@ -11,4 +11,4 @@ Este repositorio unifica la aplicación completa (backend y frontend):
 
 El README.md de cada proyecto especifico se encuentra dentro de sus respectivas carpetas.
 
-Adjunto el link del video demostrativo enseñando la estructura y componentes del proyecto completo, y su funcionamiento: [LINK AL VIDEO]
+Adjunto el link del video demostrativo enseñando la estructura y componentes del proyecto completo, y su funcionamiento: https://youtu.be/GCR_YomqmYE
