@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Path
 from sqlmodel import Session
 from typing import List, Annotated
 from app.core.database import get_db
@@ -17,7 +17,10 @@ def read_categorias(
     return service.get_categorias(db, skip=skip, limit=limit)
 
 @router.get("/{categoria_id}", response_model=schema.CategoriaResponse)
-def read_categoria(categoria_id: int, db: SessionDep):
+def read_categoria(
+        categoria_id: Annotated[int, Path(description="ID de la categoría", ge=1)],
+        db: SessionDep
+):
     db_categoria = service.get_categoria(db, categoria_id=categoria_id)
     if db_categoria is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
@@ -28,7 +31,11 @@ def create_categoria(categoria: schema.CategoriaCreate, db: SessionDep):
     return service.create_categoria(db=db, categoria=categoria)
 
 @router.put("/{categoria_id}", response_model=schema.CategoriaResponse)
-def update_categoria(categoria_id: int, categoria: schema.CategoriaCreate, db: SessionDep):
+def update_categoria(
+        categoria_id: Annotated[int, Path(description="ID de la categoría", ge=1)],
+        categoria: schema.CategoriaCreate,
+        db: SessionDep
+):
     # Usamos exclude_unset=True para obtener solo los campos que el usuario envió explicitamente
     datos_actualizar = categoria.model_dump(exclude_unset=True)
 
@@ -38,7 +45,10 @@ def update_categoria(categoria_id: int, categoria: schema.CategoriaCreate, db: S
     return db_categoria
 
 @router.delete("/{categoria_id}", response_model=schema.CategoriaResponse)
-def delete_categoria(categoria_id: int, db: SessionDep):
+def delete_categoria(
+        categoria_id: Annotated[int, Path(description="ID de la categoría", ge=1)],
+        db: SessionDep
+):
     db_categoria = service.delete_categoria(db, categoria_id)
     if db_categoria is None:
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
