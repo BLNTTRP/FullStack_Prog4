@@ -6,75 +6,49 @@ import { useParams } from 'react-router-dom';
 import type { Producto, NuevoProducto } from '../types/producto';
 import type { Categoria } from '../types/categoria';
 import type { Ingrediente } from '../types/ingrediente';
-
-const API_BASE_URL = 'http://localhost:8000/api';
+import { getProductos, createProducto, updateProducto, deleteProducto } from '../api/productos.api';
+import { getCategorias } from '../api/categorias.api';
+import { getIngredientes } from '../api/ingredientes.api';
 
 export default function ProductsPage() {
     const { id: urlId } = useParams();
     const queryClient = useQueryClient();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [productoAEditar, setProductoAEditar] = useState<Producto | null>(null);
+
+    // Estado unificado para evitar doble setState en el useEffect
+    const [modalState, setModalState] = useState<{ isOpen: boolean; productoAEditar: Producto | null }>({
+        isOpen: false,
+        productoAEditar: null,
+    });
 
     // Queries para obtener Productos, Categorías e Ingredientes
     const { data: productos = [], isLoading: loadingProductos, isError: errorProductos } = useQuery<Producto[]>({
         queryKey: ['productos'],
-        queryFn: async () => {
-            const res = await fetch(`${API_BASE_URL}/productos/`);
-            if (!res.ok) throw new Error('Error al cargar productos');
-            return res.json();
-        }
+        queryFn: getProductos,
     });
 
     const { data: categorias = [] } = useQuery<Categoria[]>({
         queryKey: ['categorias'],
-        queryFn: async () => {
-            const res = await fetch(`${API_BASE_URL}/categorias/`);
-            if (!res.ok) throw new Error('Error al cargar categorias');
-            return res.json();
-        }
+        queryFn: getCategorias,
     });
 
     const { data: ingredientes = [] } = useQuery<Ingrediente[]>({
         queryKey: ['ingredientes'],
-        queryFn: async () => {
-            const res = await fetch(`${API_BASE_URL}/ingredientes/`);
-            if (!res.ok) throw new Error('Error al cargar ingredientes');
-            return res.json();
-        }
+        queryFn: getIngredientes,
     });
 
     // Mutaciones
     const createMutation = useMutation({
-        mutationFn: async (nuevoProducto: NuevoProducto) => {
-            const response = await fetch(`${API_BASE_URL}/productos/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(nuevoProducto),
-            });
-            if (!response.ok) throw new Error('Error al crear producto');
-            return response.json();
-        },
+        mutationFn: (nuevoProducto: NuevoProducto) => createProducto(nuevoProducto),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['productos'] })
     });
 
     const updateMutation = useMutation({
-        mutationFn: async ({ id, datos }: { id: number; datos: NuevoProducto }) => {
-            const response = await fetch(`${API_BASE_URL}/productos/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos),
-            });
-            if (!response.ok) throw new Error('Error al actualizar producto');
-            return response.json();
-        },
+        mutationFn: ({ id, datos }: { id: number; datos: NuevoProducto }) => updateProducto(id, datos),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['productos'] })
     });
 
     const deleteMutation = useMutation({
-        mutationFn: async (id: number) => {
-            const response = await fetch(`${API_BASE_URL}/productos/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Error al eliminar producto');
-        },
+        mutationFn: (id: number) => deleteProducto(id),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['productos'] })
     });
 
@@ -89,20 +63,17 @@ export default function ProductsPage() {
         if (urlId && productos.length > 0 && categorias.length > 0 && ingredientes.length > 0) {
             const productoEncontrado = productos.find(p => p.id === Number(urlId));
             if (productoEncontrado) {
-                setProductoAEditar(productoEncontrado);
-                setIsModalOpen(true);
+                setModalState({ isOpen: true, productoAEditar: productoEncontrado });
             }
         }
     }, [urlId, productos, categorias, ingredientes]);
 
     const openCreateModal = () => {
-        setProductoAEditar(null);
-        setIsModalOpen(true);
+        setModalState({ isOpen: true, productoAEditar: null });
     };
 
     const openEditModal = (producto: Producto) => {
-        setProductoAEditar(producto);
-        setIsModalOpen(true);
+        setModalState({ isOpen: true, productoAEditar: producto });
     };
 
     const handleModalSubmit = (datos: NuevoProducto, id?: number) => {
@@ -111,7 +82,7 @@ export default function ProductsPage() {
         } else {
             createMutation.mutate(datos);
         }
-        setIsModalOpen(false);
+        setModalState({ isOpen: false, productoAEditar: null });
     };
 
     if (loadingProductos) return <div className="p-8 text-center">Cargando productos...</div>;
@@ -136,12 +107,12 @@ export default function ProductsPage() {
             />
 
             {/* Si isModalOpen es true, el modal se monta desde cero. Si es false, se destruye */}
-            {isModalOpen && (
+            {modalState.isOpen && (
                 <ProductoModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    isOpen={modalState.isOpen}
+                    onClose={() => setModalState({ isOpen: false, productoAEditar: null })}
                     onSubmit={handleModalSubmit}
-                    productoAEditar={productoAEditar}
+                    productoAEditar={modalState.productoAEditar}
                     categoriasDisponibles={categorias}
                     ingredientesDisponibles={ingredientes}
                 />

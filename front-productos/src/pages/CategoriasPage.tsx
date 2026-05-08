@@ -4,62 +4,39 @@ import CategoriaModal from '../components/CategoriaModal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import type { Categoria, NuevaCategoria } from '../types/categoria';
-
-const API_URL = 'http://localhost:8000/api/categorias';
+import { getCategorias, createCategoria, updateCategoria, deleteCategoria } from '../api/categorias.api';
 
 export default function CategoriasPage() {
     const { id: urlId } = useParams();
     const queryClient = useQueryClient();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [categoriaAEditar, setCategoriaAEditar] = useState<Categoria | null>(null);
+
+    // Estado unificado para evitar doble setState en el useEffect
+    const [modalState, setModalState] = useState<{ isOpen: boolean; categoriaAEditar: Categoria | null }>({
+        isOpen: false,
+        categoriaAEditar: null,
+    });
 
     const { data: categorias = [], isLoading, isError } = useQuery<Categoria[]>({
         queryKey: ['categorias'],
-        queryFn: async () => {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error('Error al cargar las categorías');
-            return response.json();
-        }
+        queryFn: getCategorias,
     });
 
     const createMutation = useMutation({
-        mutationFn: async (nuevaCategoria: NuevaCategoria) => {
-            const response = await fetch(`${API_URL}/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(nuevaCategoria),
-            });
-            if (!response.ok) throw new Error('Error al crear');
-            return response.json();
-        },
+        mutationFn: (nuevaCategoria: NuevaCategoria) => createCategoria(nuevaCategoria),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['categorias'] });
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: async (categoriaActualizada: Categoria) => {
-            const response = await fetch(`${API_URL}/${categoriaActualizada.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nombre: categoriaActualizada.nombre,
-                    descripcion: categoriaActualizada.descripcion
-                }),
-            });
-            if (!response.ok) throw new Error('Error al actualizar');
-            return response.json();
-        },
+        mutationFn: (categoriaActualizada: Categoria) => updateCategoria(categoriaActualizada),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['categorias'] });
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: async (id: number) => {
-            const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Error al eliminar');
-        },
+        mutationFn: (id: number) => deleteCategoria(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['categorias'] });
         }
@@ -76,20 +53,17 @@ export default function CategoriasPage() {
         if (urlId && categorias.length > 0) {
             const categoriaEncontrada = categorias.find(c => c.id === Number(urlId));
             if (categoriaEncontrada) {
-                setCategoriaAEditar(categoriaEncontrada);
-                setIsModalOpen(true);
+                setModalState({ isOpen: true, categoriaAEditar: categoriaEncontrada });
             }
         }
     }, [urlId, categorias]);
 
     const openCreateModal = () => {
-        setCategoriaAEditar(null);
-        setIsModalOpen(true);
+        setModalState({ isOpen: true, categoriaAEditar: null });
     };
 
     const openEditModal = (categoria: Categoria) => {
-        setCategoriaAEditar(categoria);
-        setIsModalOpen(true);
+        setModalState({ isOpen: true, categoriaAEditar: categoria });
     };
 
     const handleModalSubmit = (datos: Categoria | NuevaCategoria) => {
@@ -98,7 +72,7 @@ export default function CategoriasPage() {
         } else {
             createMutation.mutate(datos as NuevaCategoria);
         }
-        setIsModalOpen(false);
+        setModalState({ isOpen: false, categoriaAEditar: null });
     };
 
     if (isLoading) return <div className="p-8 text-center">Cargando categorías...</div>;
@@ -123,10 +97,10 @@ export default function CategoriasPage() {
             />
 
             <CategoriaModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                isOpen={modalState.isOpen}
+                onClose={() => setModalState({ isOpen: false, categoriaAEditar: null })}
                 onSubmit={handleModalSubmit}
-                categoriaAEditar={categoriaAEditar}
+                categoriaAEditar={modalState.categoriaAEditar}
             />
         </div>
     );

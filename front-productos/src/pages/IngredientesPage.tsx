@@ -4,58 +4,37 @@ import IngredienteModal from '../components/IngredienteModal';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import type { Ingrediente, NuevoIngrediente } from '../types/ingrediente';
-
-const API_URL = 'http://localhost:8000/api/ingredientes';
+import { getIngredientes, createIngrediente, updateIngrediente, deleteIngrediente } from '../api/ingredientes.api';
 
 export default function IngredientesPage() {
     const { id: urlId } = useParams();
     const queryClient = useQueryClient();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [ingredienteAEditar, setIngredienteAEditar] = useState<Ingrediente | null>(null);
+
+    // Estado unificado para evitar doble setState en el useEffect
+    const [modalState, setModalState] = useState<{ isOpen: boolean; ingredienteAEditar: Ingrediente | null }>({
+        isOpen: false,
+        ingredienteAEditar: null,
+    });
 
     const { data: ingredientes = [], isLoading, isError } = useQuery<Ingrediente[]>({
         queryKey: ['ingredientes'],
-        queryFn: async () => {
-            const response = await fetch(`${API_URL}/`);
-            if (!response.ok) throw new Error('Error al cargar ingredientes');
-            return response.json();
-        }
+        queryFn: getIngredientes,
     });
 
     const createMutation = useMutation({
-        mutationFn: async (nuevoIngrediente: NuevoIngrediente) => {
-            const response = await fetch(`${API_URL}/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(nuevoIngrediente),
-            });
-            if (!response.ok) throw new Error('Error al crear ingrediente');
-            return response.json();
-        },
+        mutationFn: (nuevoIngrediente: NuevoIngrediente) => createIngrediente(nuevoIngrediente),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['ingredientes'] })
     });
 
     const updateMutation = useMutation({
-        mutationFn: async ({ id, datos }: { id: number; datos: NuevoIngrediente }) => {
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos),
-            });
-            if (!response.ok) throw new Error('Error al actualizar ingrediente');
-            return response.json();
-        },
+        mutationFn: ({ id, datos }: { id: number; datos: NuevoIngrediente }) => updateIngrediente(id, datos),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['ingredientes'] })
     });
 
     const deleteMutation = useMutation({
-        mutationFn: async (id: number) => {
-            const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Error al eliminar ingrediente');
-        },
+        mutationFn: (id: number) => deleteIngrediente(id),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['ingredientes'] })
     });
-
 
     const handleDelete = async (id: number) => {
         if (!window.confirm('¿Estás seguro de que deseas eliminar este ingrediente?')) return;
@@ -67,20 +46,17 @@ export default function IngredientesPage() {
         if (urlId && ingredientes.length > 0) {
             const ingredienteEncontrado = ingredientes.find(i => i.id === Number(urlId));
             if (ingredienteEncontrado) {
-                setIngredienteAEditar(ingredienteEncontrado);
-                setIsModalOpen(true);
+                setModalState({ isOpen: true, ingredienteAEditar: ingredienteEncontrado });
             }
         }
     }, [urlId, ingredientes]);
 
     const openCreateModal = () => {
-        setIngredienteAEditar(null);
-        setIsModalOpen(true);
+        setModalState({ isOpen: true, ingredienteAEditar: null });
     };
 
     const openEditModal = (ingrediente: Ingrediente) => {
-        setIngredienteAEditar(ingrediente);
-        setIsModalOpen(true);
+        setModalState({ isOpen: true, ingredienteAEditar: ingrediente });
     };
 
     const handleModalSubmit = (datos: NuevoIngrediente, id?: number) => {
@@ -89,7 +65,7 @@ export default function IngredientesPage() {
         } else {
             createMutation.mutate(datos);
         }
-        setIsModalOpen(false);
+        setModalState({ isOpen: false, ingredienteAEditar: null });
     };
 
     if (isLoading) return <div className="p-8 text-center">Cargando ingredientes...</div>;
@@ -113,11 +89,11 @@ export default function IngredientesPage() {
                 onDelete={handleDelete}
             />
 
-            {isModalOpen && (
+            {modalState.isOpen && (
                 <IngredienteModal
-                    onClose={() => setIsModalOpen(false)}
+                    onClose={() => setModalState({ isOpen: false, ingredienteAEditar: null })}
                     onSubmit={handleModalSubmit}
-                    ingredienteAEditar={ingredienteAEditar}
+                    ingredienteAEditar={modalState.ingredienteAEditar}
                 />
             )}
         </div>
