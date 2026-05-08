@@ -1,38 +1,28 @@
-from sqlmodel import Session, select
-from sqlalchemy.sql import func
-from app.categoria.model import Categoria
 from app.categoria.schema import CategoriaCreate
+from app.core.unit_of_work import UnitOfWork
 
-def get_categorias(db: Session, skip: int = 0, limit: int = 100):
-    # Solo traemos las que NO están eliminadas
-    statement = select(Categoria).where(Categoria.deleted_at.is_(None)).offset(skip).limit(limit)
-    return db.exec(statement).all()
+def get_categorias(uow: UnitOfWork, skip: int = 0, limit: int = 100):
+    return uow.categorias.get_all(skip=skip, limit=limit)
 
-def get_categoria(db: Session, categoria_id: int):
-    statement = select(Categoria).where(Categoria.id == categoria_id, Categoria.deleted_at.is_(None))
-    return db.exec(statement).first()
+def get_categoria(uow: UnitOfWork, categoria_id: int):
+    return uow.categorias.get_by_id(categoria_id)
 
-def create_categoria(db: Session, categoria: CategoriaCreate):
-    db_categoria = Categoria(**categoria.model_dump())
-    db.add(db_categoria)
-    db.commit()
-    db.refresh(db_categoria)
+def create_categoria(uow: UnitOfWork, categoria: CategoriaCreate):
+    db_categoria = uow.categorias.add(categoria)
+    uow.commit()
+    uow.refresh(db_categoria)
     return db_categoria
 
-def update_categoria(db: Session, categoria_id: int, categoria_data: dict):
-    db_categoria = get_categoria(db, categoria_id)
+def update_categoria(uow: UnitOfWork, categoria_id: int, categoria_data: dict):
+    db_categoria = uow.categorias.update(categoria_id, categoria_data)
     if db_categoria:
-        for key, value in categoria_data.items():
-            setattr(db_categoria, key, value)
-        db.commit()
-        db.refresh(db_categoria)
+        uow.commit()
+        uow.refresh(db_categoria)
     return db_categoria
 
-def delete_categoria(db: Session, categoria_id: int):
-    db_categoria = get_categoria(db, categoria_id)
+def delete_categoria(uow: UnitOfWork, categoria_id: int):
+    db_categoria = uow.categorias.soft_delete(categoria_id)
     if db_categoria:
-        # Borrado Lógico: Marcamos la fecha de eliminación en lugar de borrar el registro
-        db_categoria.deleted_at = func.now()
-        db.commit()
-        db.refresh(db_categoria)
+        uow.commit()
+        uow.refresh(db_categoria)
     return db_categoria

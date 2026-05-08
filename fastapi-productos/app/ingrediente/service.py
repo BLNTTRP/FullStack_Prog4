@@ -1,36 +1,28 @@
-from sqlmodel import Session, select
-from sqlalchemy.sql import func
-from app.ingrediente.model import Ingrediente
 from app.ingrediente.schema import IngredienteCreate
+from app.core.unit_of_work import UnitOfWork
 
-def get_ingredientes(db: Session, skip: int = 0, limit: int = 100):
-    statement = select(Ingrediente).where(Ingrediente.deleted_at.is_(None)).offset(skip).limit(limit)
-    return db.exec(statement).all()
+def get_ingredientes(uow: UnitOfWork, skip: int = 0, limit: int = 100):
+    return uow.ingredientes.get_all(skip=skip, limit=limit)
 
-def get_ingrediente(db: Session, ingrediente_id: int):
-    statement = select(Ingrediente).where(Ingrediente.id == ingrediente_id, Ingrediente.deleted_at.is_(None))
-    return db.exec(statement).first()
+def get_ingrediente(uow: UnitOfWork, ingrediente_id: int):
+    return uow.ingredientes.get_by_id(ingrediente_id)
 
-def create_ingrediente(db: Session, ingrediente: IngredienteCreate):
-    db_ingrediente = Ingrediente(**ingrediente.model_dump())
-    db.add(db_ingrediente)
-    db.commit()
-    db.refresh(db_ingrediente)
+def create_ingrediente(uow: UnitOfWork, ingrediente: IngredienteCreate):
+    db_ingrediente = uow.ingredientes.add(ingrediente)
+    uow.commit()
+    uow.refresh(db_ingrediente)
     return db_ingrediente
 
-def update_ingrediente(db: Session, ingrediente_id: int, ingrediente_data: dict):
-    db_ingrediente = get_ingrediente(db, ingrediente_id)
+def update_ingrediente(uow: UnitOfWork, ingrediente_id: int, ingrediente_data: dict):
+    db_ingrediente = uow.ingredientes.update(ingrediente_id, ingrediente_data)
     if db_ingrediente:
-        for key, value in ingrediente_data.items():
-            setattr(db_ingrediente, key, value)
-        db.commit()
-        db.refresh(db_ingrediente)
+        uow.commit()
+        uow.refresh(db_ingrediente)
     return db_ingrediente
 
-def delete_ingrediente(db: Session, ingrediente_id: int):
-    db_ingrediente = get_ingrediente(db, ingrediente_id)
+def delete_ingrediente(uow: UnitOfWork, ingrediente_id: int):
+    db_ingrediente = uow.ingredientes.soft_delete(ingrediente_id)
     if db_ingrediente:
-        db_ingrediente.deleted_at = func.now()
-        db.commit()
-        db.refresh(db_ingrediente)
+        uow.commit()
+        uow.refresh(db_ingrediente)
     return db_ingrediente
