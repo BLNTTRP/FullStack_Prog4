@@ -13,10 +13,31 @@ Este es el backend del proyecto Full Stack de Gestión de Categorías, Productos
 
 ---
 
+## 🏛️ Arquitectura
+
+El proyecto aplica los patrones **Repository** y **Unit of Work (UoW)** para separar responsabilidades en capas bien definidas:
+
+Router → Service → Unit of Work → Repository → Base de Datos
+
+| Capa             | Archivo                | Responsabilidad                                                                                 |
+|------------------|------------------------|-------------------------------------------------------------------------------------------------|
+| **Router**       | `router.py`            | Recibe las peticiones HTTP y devuelve respuestas. Inyecta el UoW.                               |
+| **Service**      | `service.py`           | Contiene la lógica de negocio. Orquesta llamadas al repositorio a través del UoW.               |
+| **Unit of Work** | `core/unit_of_work.py` | Gestiona la transacción (commit/rollback). Agrupa todos los repositorios bajo una misma sesión. |
+| **Repository**   | `repository.py`        | Encapsula el acceso a la base de datos (queries). No hace commit directamente.                  |
+| **Schema**       | `schema.py`            | Define los contratos de entrada y salida de la API (Pydantic).                                  |
+| **Model**        | `model.py`             | Define las tablas de la base de datos (SQLModel).                                               |
+
+### 📁 Estructura del Proyecto
+
+![img.png](resources/img.png)
+
+---
+
 ## ⚙️ Requisitos Previos
 
 Asegúrate de tener instalado en tu computadora:
-* **Python 3.8** o superior.
+* **Python 3.10** o superior.
 * **PostgreSQL:** El motor de base de datos instalado y corriendo.
 * **pgAdmin 4 (Opcional pero recomendado):** Para gestionar la base de datos de forma visual.
 
