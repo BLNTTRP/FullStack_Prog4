@@ -1,7 +1,9 @@
-from sqlmodel import Session, select
+from typing import cast
+from sqlmodel import Session, select, col
 from sqlalchemy.sql import func
 from app.ingrediente.model import Ingrediente
 from app.ingrediente.schema import IngredienteCreate
+
 
 class IngredienteRepository:
     def __init__(self, session: Session):
@@ -10,18 +12,18 @@ class IngredienteRepository:
     def get_all(self, skip: int = 0, limit: int = 100) -> list[Ingrediente]:
         statement = (
             select(Ingrediente)
-            .where(Ingrediente.deleted_at.is_(None))
+            .where(col(Ingrediente.deleted_at).is_(None))
             .offset(skip)
             .limit(limit)
         )
-        return self.session.exec(statement).all()
+        return cast(list[Ingrediente], self.session.exec(statement).all())
 
     def get_by_id(self, ingrediente_id: int) -> Ingrediente | None:
         statement = select(Ingrediente).where(
             Ingrediente.id == ingrediente_id,
-            Ingrediente.deleted_at.is_(None)
+            col(Ingrediente.deleted_at).is_(None)
         )
-        return self.session.exec(statement).first()
+        return cast(Ingrediente | None, self.session.exec(statement).first())
 
     def add(self, ingrediente: IngredienteCreate) -> Ingrediente:
         db_ingrediente = Ingrediente(**ingrediente.model_dump())

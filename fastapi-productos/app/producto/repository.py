@@ -1,7 +1,9 @@
-from sqlmodel import Session, select
+from typing import cast
+from sqlmodel import Session, select, col
 from sqlalchemy.sql import func
 from app.producto.model import Producto, ProductoCategoria, ProductoIngrediente
 from app.producto.schema import ProductoCreate
+
 
 class ProductoRepository:
     def __init__(self, session: Session):
@@ -10,18 +12,18 @@ class ProductoRepository:
     def get_all(self, skip: int = 0, limit: int = 100) -> list[Producto]:
         statement = (
             select(Producto)
-            .where(Producto.deleted_at.is_(None))
+            .where(col(Producto.deleted_at).is_(None))
             .offset(skip)
             .limit(limit)
         )
-        return self.session.exec(statement).all()
+        return cast(list[Producto], self.session.exec(statement).all())
 
     def get_by_id(self, producto_id: int) -> Producto | None:
         statement = select(Producto).where(
             Producto.id == producto_id,
-            Producto.deleted_at.is_(None)
+            col(Producto.deleted_at).is_(None)
         )
-        return self.session.exec(statement).first()
+        return cast(Producto | None, self.session.exec(statement).first())
 
     def add(self, producto: ProductoCreate) -> Producto:
         producto_data = producto.model_dump(exclude={"categorias", "ingredientes"})
@@ -62,7 +64,7 @@ class ProductoRepository:
             stmt = select(ProductoCategoria).where(ProductoCategoria.producto_id == producto_id)
             for rel in self.session.exec(stmt).all():
                 self.session.delete(rel)
-            for cat_data in categorias_data:
+            for cat_data in categorias_data or []:
                 self.session.add(ProductoCategoria(
                     producto_id=producto_id,
                     categoria_id=cat_data["categoria_id"],
@@ -73,7 +75,7 @@ class ProductoRepository:
             stmt = select(ProductoIngrediente).where(ProductoIngrediente.producto_id == producto_id)
             for rel in self.session.exec(stmt).all():
                 self.session.delete(rel)
-            for ing_data in ingredientes_data:
+            for ing_data in ingredientes_data or []:
                 self.session.add(ProductoIngrediente(
                     producto_id=producto_id,
                     ingrediente_id=ing_data["ingrediente_id"],
