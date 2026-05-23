@@ -28,9 +28,54 @@ Router → Service → Unit of Work → Repository → Base de Datos
 | **Schema**       | `schema.py`            | Define los contratos de entrada y salida de la API (Pydantic).                                  |
 | **Model**        | `model.py`             | Define las tablas de la base de datos (SQLModel).                                               |
 
-### 📁 Estructura del Proyecto
+### 📁 Estructura del Proyecto (visualizar en MD)
 
-![img.png](resources/img.png)
+fastapi-productos/
+│
+├── app/
+│   ├── main.py                         ← Punto de entrada: FastAPI, CORS, routers, create_all
+│   │
+│   ├── core/
+│   │   ├── database.py                 ← Configuración del engine (PostgreSQL + .env)
+│   │   └── unit_of_work.py             ← UoW: sesión única, agrupa todos los repositorios
+│   │
+│   ├── categoria/
+│   │   ├── model.py                    ← Categoria (auto-referencia parent_id, soft delete)
+│   │   ├── schema.py                   ← CategoriaCreate / CategoriaResponse
+│   │   ├── repository.py               ← CategoriaRepository
+│   │   ├── service.py                  ← Lógica de negocio de categorías
+│   │   └── router.py                   ← GET/POST /api/categorias/
+│   │
+│   ├── ingrediente/
+│   │   ├── model.py                    ← Ingrediente (es_alergeno, soft delete)
+│   │   ├── schema.py                   ← IngredienteCreate / IngredienteResponse
+│   │   ├── repository.py               ← IngredienteRepository
+│   │   ├── service.py                  ← Lógica de negocio de ingredientes
+│   │   └── router.py                   ← GET/POST /api/ingredientes/
+│   │
+│   ├── producto/
+│   │   ├── model.py                    ← Producto + ProductoCategoria + ProductoIngrediente
+│   │   ├── schema.py                   ← ProductoCreate / ProductoResponse (relaciones anidadas)
+│   │   ├── repository.py               ← ProductoRepository (gestiona tablas intermedias)
+│   │   ├── service.py                  ← Lógica de negocio de productos
+│   │   └── router.py                   ← GET/POST/PUT/DELETE /api/productos/{id}
+│   │
+│   └── pedido/
+│       ├── model.py                    ← Pedido + DetallePedido (composición 1..N)
+│       ├── schema.py                   ← PedidoCreate / PedidoUpdate / PedidoResponse
+│       │                                  DetallePedidoCreate / DetallePedidoResponse
+│       ├── repository.py               ← PedidoRepository + DetallePedidoRepository
+│       ├── service.py                  ← Lógica de negocio de pedidos y detalles
+│       └── router.py                   ← GET/POST/PUT/DELETE /api/pedido/{id}
+│                                          GET /api/pedido/{id}/detalles/{producto_id}
+│
+├── resources/
+│   └── food_store_erd_v6.svg           ← Diagrama ERD del dominio completo
+│
+├── .env                                ← Variables de entorno (credenciales de BD)
+├── requirements.txt                    ← Dependencias Python del proyecto
+├── test_api.http                       ← REST Client: pruebas de los 4 módulos
+└── README.md                           ← Documentación del proyecto
 
 ---
 
@@ -100,4 +145,4 @@ FastAPI genera documentación interactiva automáticamente. Una vez que el servi
 * **ReDoc:** http://localhost:8000/redoc
 
 **Archivo REST Client**
-En la raíz del proyecto se incluye un archivo llamado `test_api.http`. Puedes utilizarlo con la extensión "REST Client" de Visual Studio Code para probar el CRUD completo de Productos, Categorías e Ingredientes, directamente desde tu editor de código.
+En la raíz del proyecto se incluye un archivo llamado `test_api.http`. Puedes utilizarlo con la extensión "REST Client" de Visual Studio Code para probar el CRUD completo de Categorías, Ingredientes, Productos y Pedido, directamente desde tu editor de código.
