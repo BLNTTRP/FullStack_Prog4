@@ -5,18 +5,20 @@ from app.core.database import engine
 from app.categoria.router import router as categoria_router
 from app.producto.router import router as producto_router
 from app.ingrediente.router import router as ingrediente_router
+from app.pedido.router import router as pedido_router
 from app.categoria.model import Categoria
 from app.ingrediente.model import Ingrediente
 from app.producto.model import Producto, ProductoCategoria, ProductoIngrediente
+from app.pedido.model import Pedido, DetallePedido  # registra las tablas
 
 # Crea todas las tablas en la base de datos
 SQLModel.metadata.create_all(engine)
 
 # Inicializamos la aplicación FastAPI
 app = FastAPI(
-    title="API Full Stack - Productos, Categorías, Ingredientes",
+    title="API Full Stack - Productos, Categorías, Ingredientes y Pedidos",
     description="Backend para el proyecto con React y FastAPI",
-    version="3.0.0"
+    version="4.0.0"
 )
 
 # Configuración de CORS
@@ -38,7 +40,8 @@ app.add_middleware(
 app.include_router(categoria_router)
 app.include_router(producto_router)
 app.include_router(ingrediente_router)
+app.include_router(pedido_router)
 
 @app.get("/")
 def ruta_raiz():
-    return {"mensaje": "Bienvenido a la API de Productos, Categorías e Ingredientes"}
+    return {"mensaje": "Bienvenido a la API de Productos, Categorías, Ingredientes y Pedidos"}

@@ -3,6 +3,7 @@ from app.core.database import engine
 from app.categoria.repository import CategoriaRepository
 from app.ingrediente.repository import IngredienteRepository
 from app.producto.repository import ProductoRepository
+from app.pedido.repository import PedidoRepository, DetallePedidoRepository
 
 class UnitOfWork:
     """
@@ -15,6 +16,8 @@ class UnitOfWork:
         self.categorias: CategoriaRepository = CategoriaRepository(self.session)
         self.ingredientes: IngredienteRepository = IngredienteRepository(self.session)
         self.productos: ProductoRepository = ProductoRepository(self.session)
+        self.pedidos: PedidoRepository = PedidoRepository(self.session)
+        self.detalles_pedido: DetallePedidoRepository = DetallePedidoRepository(self.session)
 
     def commit(self):
         self.session.commit()
