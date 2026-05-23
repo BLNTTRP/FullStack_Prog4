@@ -116,3 +116,61 @@ Content-Type: application/json
 
 ### Eliminar Producto (Prueba el borrado lógico)
 DELETE {{baseUrl}}/productos/1
+
+### ===========
+### 4. PEDIDOS
+### ===========
+
+### Crear Pedido con 2 ítems
+### (Asume producto_id=1 disponible; recrearlo si fue eliminado)
+POST {{baseUrl}}/pedido/
+Content-Type: application/json
+
+{
+  "usuario_id": 1,
+  "direccion_id": null,
+  "forma_pago_codigo": "EFECTIVO",
+  "notas": "Sin cebolla por favor",
+  "descuento": 0.00,
+  "costo_envio": 50.00,
+  "detalles": [
+    {
+      "producto_id": 1,
+      "cantidad": 2,
+      "personalizacion": null
+    }
+  ]
+}
+
+### Obtener todos los Pedidos
+GET {{baseUrl}}/pedido/
+
+### Obtener un Pedido por ID (Asume pedido_id=1)
+GET {{baseUrl}}/pedido/1
+
+### Obtener los Detalles de un Pedido
+GET {{baseUrl}}/pedido/1/detalles
+
+### Obtener un Detalle específico (pedido_id=1, producto_id=1)
+GET {{baseUrl}}/pedido/1/detalles/1
+
+### Actualizar estado del Pedido (avanzar a CONFIRMADO)
+PUT {{baseUrl}}/pedido/1
+Content-Type: application/json
+
+{
+  "estado_codigo": "CONFIRMADO"
+}
+
+### Actualizar múltiples campos del Pedido
+PUT {{baseUrl}}/pedido/1
+Content-Type: application/json
+
+{
+  "estado_codigo": "EN_PREP",
+  "notas": "Urgente - mesa 5",
+  "forma_pago_codigo": "TRANSFERENCIA"
+}
+
+### Eliminar Pedido (borrado lógico)
+DELETE {{baseUrl}}/pedido/1
